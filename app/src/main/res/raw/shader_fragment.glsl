@@ -1,3 +1,6 @@
+#version 300 es
+
+out vec4 fragColor;
 layout (std140) uniform Material {
 	vec4 diffuse;
 	vec4 specular;
@@ -17,7 +20,7 @@ const float ambient_light = 0.2;
 
 void main(){
 
-    gl_FragColor = vec4(world_normal.x, world_normal.y, world_normal.z, 1);
+    fragColor = vec4(world_normal.x, world_normal.y, world_normal.z, 1);
 
 	//vec4 light;
 

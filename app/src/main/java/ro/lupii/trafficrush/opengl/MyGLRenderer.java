@@ -60,7 +60,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
 
         // Set the background frame color
-        GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        GLES30.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
         Matrix.setLookAtM(m_viewMatrix, 0, 0, 0, 50, 0, 0, 0, 0, 1, 0);
 

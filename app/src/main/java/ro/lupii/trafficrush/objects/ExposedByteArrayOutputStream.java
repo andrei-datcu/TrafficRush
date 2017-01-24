@@ -11,4 +11,8 @@ final class ExposedByteArrayOutputStream extends ByteArrayOutputStream {
     public byte[] getBackingArray() {
         return buf;
     }
+
+    public int getBackingArrayLength() {
+        return count;
+    }
 }

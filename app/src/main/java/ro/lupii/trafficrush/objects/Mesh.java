@@ -54,10 +54,10 @@ public class Mesh {
         Utils.doAssert(hasNormals || hasTexCoords);
 
         HashMap<Triplet<Integer, Integer, Integer>, Integer> vCache = new HashMap<>();
-        ExposedObjectOutputStream tmpVertix = new ExposedObjectOutputStream(new ExposedByteArrayOutputStream());
-        ExposedObjectOutputStream tmpNormals = hasNormals ? new ExposedObjectOutputStream(new ExposedByteArrayOutputStream()) : null;
-        ExposedObjectOutputStream tmpTexCoords = hasTexCoords ? new ExposedObjectOutputStream(new ExposedByteArrayOutputStream()) : null;
-        ExposedObjectOutputStream tmpFaces = new ExposedObjectOutputStream(new ExposedByteArrayOutputStream());
+        ExposedDataOutputStream tmpVertix = new ExposedDataOutputStream(new ExposedByteArrayOutputStream());
+        ExposedDataOutputStream tmpNormals = hasNormals ? new ExposedDataOutputStream(new ExposedByteArrayOutputStream()) : null;
+        ExposedDataOutputStream tmpTexCoords = hasTexCoords ? new ExposedDataOutputStream(new ExposedByteArrayOutputStream()) : null;
+        ExposedDataOutputStream tmpFaces = new ExposedDataOutputStream(new ExposedByteArrayOutputStream());
         int itemsCount = 0;
 
         for (OBJFace face : objFaces) {
@@ -99,10 +99,10 @@ public class Mesh {
             }
         }
 
-        ByteBuffer vertices = ByteBuffer.wrap(((ExposedByteArrayOutputStream) tmpVertix.getWrappedStream()).getBackingArray());
-        ByteBuffer normals = hasNormals ? ByteBuffer.wrap(((ExposedByteArrayOutputStream) tmpTexCoords.getWrappedStream()).getBackingArray()): null;
-        ByteBuffer texCoords = hasTexCoords ? ByteBuffer.wrap(((ExposedByteArrayOutputStream) tmpTexCoords.getWrappedStream()).getBackingArray()): null;
-        ByteBuffer faces = ByteBuffer.wrap(((ExposedByteArrayOutputStream) tmpFaces.getWrappedStream()).getBackingArray());
+        ByteBuffer vertices = tmpVertix.toByteBuffer();
+        ByteBuffer normals = hasNormals ? tmpNormals.toByteBuffer() : null;
+        ByteBuffer texCoords = hasTexCoords ? tmpTexCoords.toByteBuffer() : null;
+        ByteBuffer faces = tmpFaces.toByteBuffer();
 
         buildGLBuffers(itemsCount, objFaces.size(), vertices, normals, texCoords, faces);
         m_faceCount = objFaces.size();
@@ -154,7 +154,7 @@ public class Mesh {
         GLES30.glGenBuffers(1, tmpVaoArray, 0);
         m_ibo = tmpVaoArray[0];
 
-        Utils.doAssert(faces.capacity() == 3 * 4 * faceCount);
+        Utils.doAssert(faces.limit() == 3 * 4 * faceCount);
         GLES30.glBindBuffer(GLES30.GL_ELEMENT_ARRAY_BUFFER, m_ibo);
         GLES30.glBufferData(GLES30.GL_ELEMENT_ARRAY_BUFFER, 3 * 4 * faceCount,
                 faces, GLES30.GL_STATIC_DRAW);
@@ -178,6 +178,8 @@ public class Mesh {
      * Also, buffers the data and binds it on pipe. Call this only after the VAO has been bound
      */
     private int generateVBO(Buffer buffer, int count, int floatCount, int pipe) {
+
+        Utils.doAssert(buffer.limit() == count * floatCount * 4);
 
         int[] tmpVBOArray = new int[1];
         GLES30.glGenBuffers(1, tmpVBOArray, 0);
