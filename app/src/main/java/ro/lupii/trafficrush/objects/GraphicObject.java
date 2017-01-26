@@ -65,6 +65,7 @@ public class GraphicObject {
 
     public void draw() {
         GLES30.glUniformMatrix4fv(m_modelMatrixHandle, 1, false, m_modelMatrix, 0);
+        Utils.doAssert(GLES30.glGetError() == GLES30.GL_NO_ERROR);
         for (Mesh m : m_meshes) {
             m.draw();
         }

@@ -39,6 +39,7 @@ public class Mesh {
     private int m_normalsVBO = -1;
     private int m_texCoordsVBO = -1;
     private int m_faceCount;
+    private ShaderProgram m_program;
 
     public Mesh(OBJModel objModel, OBJMesh objMesh, MTLLibrary mtlLibrary) throws IOException {
 
@@ -132,11 +133,13 @@ public class Mesh {
 
     public void setProgram(ShaderProgram program) {
         //TODO matrial uniforms and textures here
+        m_program = program;
     }
 
     public void draw() {
         GLES30.glBindVertexArray(m_vao);
         GLES30.glDrawElements(GLES30.GL_TRIANGLES, m_faceCount * 3, GLES30.GL_UNSIGNED_INT, 0);
+        Utils.doAssert(GLES30.glGetError() == GLES30.GL_NO_ERROR);
         GLES30.glBindVertexArray(0);
     }
 
@@ -180,6 +183,7 @@ public class Mesh {
     private int generateVBO(Buffer buffer, int count, int floatCount, int pipe) {
 
         Utils.doAssert(buffer.limit() == count * floatCount * 4);
+        Utils.doAssert(buffer.position() == 0);
 
         int[] tmpVBOArray = new int[1];
         GLES30.glGenBuffers(1, tmpVBOArray, 0);
@@ -189,11 +193,11 @@ public class Mesh {
         GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, vbo);
         Utils.doAssert(GLES30.glGetError() == GLES30.GL_NO_ERROR);
         // No sizeof in java :(
-        GLES30.glBufferData(GLES20.GL_ARRAY_BUFFER, count * floatCount * 4, buffer, GLES20.GL_STATIC_DRAW);
+        GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER, count * floatCount * 4, buffer, GLES30.GL_STATIC_DRAW);
         Utils.doAssert(GLES30.glGetError() == GLES30.GL_NO_ERROR);
         GLES30.glEnableVertexAttribArray(pipe);
         Utils.doAssert(GLES30.glGetError() == GLES30.GL_NO_ERROR);
-        GLES30.glVertexAttribPointer(pipe, floatCount, GLES20.GL_FLOAT, false, 0, 0);
+        GLES30.glVertexAttribPointer(pipe, floatCount, GLES30.GL_FLOAT, false, 0, 0);
         Utils.doAssert(GLES30.glGetError() == GLES30.GL_NO_ERROR);
 
         return vbo;

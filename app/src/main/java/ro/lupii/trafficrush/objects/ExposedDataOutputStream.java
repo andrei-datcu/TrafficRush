@@ -1,14 +1,20 @@
 package ro.lupii.trafficrush.objects;
 
+import com.google.common.io.LittleEndianDataOutputStream;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 /**
  * Created by andrei on 1/24/17.
  */
 
-final class ExposedDataOutputStream extends DataOutputStream {
+
+// TODO ideally this should encapsulate LiitleEndianDataOutputStream or DataOutputStream
+// depending on the platform's endianness
+final class ExposedDataOutputStream extends LittleEndianDataOutputStream {
 
     private ExposedByteArrayOutputStream m_wrappedStream;
 
@@ -23,6 +29,8 @@ final class ExposedDataOutputStream extends DataOutputStream {
 
     public ByteBuffer toByteBuffer() throws IOException {
         flush();
-        return ByteBuffer.wrap(m_wrappedStream.getBackingArray(), 0, m_wrappedStream.getBackingArrayLength());
+        ByteBuffer result = ByteBuffer.wrap(m_wrappedStream.getBackingArray(), 0, m_wrappedStream.getBackingArrayLength());
+        result.order(ByteOrder.nativeOrder());
+        return result;
     }
 }

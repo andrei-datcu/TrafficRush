@@ -20,7 +20,8 @@ const float ambient_light = 0.2;
 
 void main(){
 
-    fragColor = vec4(world_normal.x, world_normal.y, world_normal.z, 1);
+    fragColor = vec4(world_normal.xyz, 1);
+    //fragColor = vec4(1, 0, 0, 1);
 
 	//vec4 light;
 
